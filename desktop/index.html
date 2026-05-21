@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orellius Telegram Manager</title>
+    <style>
+      body { margin: 0; background: #0f0f1a; }
+      #orellius-boot-screen {
+        position: fixed; inset: 0; z-index: 99998;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        background: #0f0f1a; color: #888; font-family: system-ui, sans-serif;
+        transition: opacity 0.3s;
+      }
+      #orellius-boot-screen.hidden { opacity: 0; pointer-events: none; }
+      #orellius-boot-screen .spinner {
+        width: 40px; height: 40px; border: 3px solid #222;
+        border-top-color: #3b82f6; border-radius: 50%;
+        animation: spin 0.8s linear infinite; margin-bottom: 16px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <!-- Boot screen shown immediately while JS loads -->
+    <div id="orellius-boot-screen">
+      <div class="spinner"></div>
+      <div style="font-size:13px" id="boot-status">Loading...</div>
+    </div>
+    <div id="root"></div>
+    <script>
+      // Auto-retry on dev server not ready (Tauri opens before Vite)
+      var bootRetries = 0;
+      var maxRetries = 15;
+      window.addEventListener('error', function onBootError(e) {
+        if (e.filename && e.filename.includes('main.tsx') && bootRetries < maxRetries) {
+          bootRetries++;
+          var el = document.getElementById('boot-status');
+          if (el) el.textContent = 'Waiting for dev server... (' + bootRetries + ')';
+          setTimeout(function() { window.location.reload(); }, 1500);
+          e.preventDefault();
+        }
+      }, true);
+      // Hide boot screen once React mounts
+      var observer = new MutationObserver(function() {
+        var root = document.getElementById('root');
+        if (root && root.children.length > 0) {
+          var boot = document.getElementById('orellius-boot-screen');
+          if (boot) { boot.classList.add('hidden'); setTimeout(function() { boot.remove(); }, 300); }
+          observer.disconnect();
+        }
+      });
+      observer.observe(document.getElementById('root'), { childList: true });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
