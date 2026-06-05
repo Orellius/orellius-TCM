@@ -1,16 +1,15 @@
 # orellius-TCM
 
-> **Research project — archived April 2026. Released as open source for educational purposes.**
+> [!IMPORTANT]
+> **Archived April 2026. This project is no longer maintained.** Published as open source so others can study the architecture patterns.
 
 A Telegram OSINT monitoring and content pipeline built to research how multi-agent LLM pipelines handle real-time signal translation, triage, and human-in-the-loop review at scale. The architecture explores how Tauri desktop apps can front-end Python agent backends, and how LangGraph orchestrates a multi-step review flow over streaming Telegram data.
-
-This was not a commercial product. It was built to understand the problem space. The code is published so others can study the patterns.
 
 ---
 
 ## What this was
 
-A desktop application that monitored a set of Telegram source channels, ran incoming messages through a local LLM translation and analysis pipeline, presented flagged content for human review, and published approved content to target channels — all from a single Tauri app backed by a FastAPI agent service.
+A desktop application that monitored a set of Telegram source channels, ran incoming messages through a local LLM translation and analysis pipeline, presented flagged content for human review, and published approved content to target channels - all from a single Tauri app backed by a FastAPI agent service.
 
 **Research questions it was probing:**
 
@@ -28,7 +27,7 @@ A desktop application that monitored a set of Telegram source channels, ran inco
 | Channel monitoring | Telethon MTProto, real-time message stream from N source channels |
 | Translation pipeline | Ollama local inference (Qwen 2.5:32B for translation, Llama 3.3:70B for orchestration) |
 | LangGraph review flow | Multi-step agent pipeline: ingest → translate → classify → human review → publish |
-| Human review UI | Tauri frontend — approve, reject, or re-classify before publish |
+| Human review UI | Tauri frontend - approve, reject, or re-classify before publish |
 | Watermark removal | Strips source channel watermarks from forwarded media |
 | Stealth ghost monitoring | Monitor channels without appearing in the member list |
 | RBAC | Role-based access for multi-operator setups |
@@ -57,22 +56,25 @@ Telegram channels (MTProto via Telethon)
         │
         ▼
 FastAPI + LangGraph pipeline
-  ├── Ingest agent       — pulls messages, deduplicates via Qdrant
-  ├── Translation agent  — Ollama local LLM, preserves structure
-  ├── Classification     — flags by topic, urgency, source credibility
-  └── Review queue       — holds messages for human decision
+  ├── Ingest agent       - pulls messages, deduplicates via Qdrant
+  ├── Translation agent  - Ollama local LLM, preserves structure
+  ├── Classification     - flags by topic, urgency, source credibility
+  └── Review queue       - holds messages for human decision
         │
         ▼
 Tauri desktop app (WebSocket bridge)
-  ├── Review panel       — approve / reject / reclassify
+  ├── Review panel       - approve / reject / reclassify
   └── Publish confirmed → target Telegram channel
 ```
 
-The Tauri frontend communicates with the FastAPI backend over a local WebSocket. The pipeline is stateful — each message carries a lifecycle tag (ingest → translated → reviewed → published or rejected) persisted to PostgreSQL.
+The Tauri frontend communicates with the FastAPI backend over a local WebSocket. The pipeline is stateful - each message carries a lifecycle tag (ingest → translated → reviewed → published or rejected) persisted to PostgreSQL.
 
 ---
 
 ## Running it (for study purposes)
+
+> [!NOTE]
+> You will need a Telegram API ID and hash from [my.telegram.org](https://my.telegram.org), an Ollama instance with the relevant models pulled, and Docker for the database stack.
 
 ```bash
 # 1. Copy and fill environment
@@ -91,15 +93,14 @@ uvicorn main:app --reload
 bun install && bun run tauri:dev
 ```
 
-You will need a Telegram API ID and hash from [my.telegram.org](https://my.telegram.org), an Ollama instance with the relevant models pulled, and Docker for the database stack.
-
 ---
 
-## Disclaimer
+## Responsible use
 
-This project was built for personal research into LLM agent pipelines and Telegram data processing architectures. It is published as open source so others can study the patterns — the LangGraph orchestration, Tauri↔Python WebSocket bridge, local LLM integration, and human-in-the-loop review design.
+> [!WARNING]
+> Use of this code to monitor Telegram channels must comply with [Telegram's Terms of Service](https://telegram.org/tos) and applicable law in your jurisdiction. The author assumes no responsibility for misuse.
 
-Use of this code to monitor Telegram channels must comply with Telegram's Terms of Service and applicable law. The authors assume no responsibility for misuse.
+This project was built for personal research into LLM agent pipelines and Telegram data processing architectures. It is published so others can study the patterns - LangGraph orchestration, Tauri↔Python WebSocket bridge, local LLM integration, and human-in-the-loop review design.
 
 ---
 
