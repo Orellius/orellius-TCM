@@ -105,3 +105,10 @@ This project was built for personal research into LLM agent pipelines and Telegr
 ---
 
 *Archived April 2026. See [Orellius](https://github.com/Orellius) for active work.*
+
+## License
+
+AGPL-3.0. See [LICENSE](LICENSE).
+
+If you run a modified version as a network service, the AGPL requires you to offer that
+modified source to its users.

@@ -48,3 +48,8 @@ Thumbs.db
 .claude/
 backend/data/
 !backend/data/hfc_zones.json
+
+# agent config
+CLAUDE.md
+AGENTS.md
+.claude/
